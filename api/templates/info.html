@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ skin_name }} {{ info }}</title>
+    <link href="https://fonts.cdnfonts.com/css/valorant" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #141414;
+            color: #ece8e1;
+        }
+        #title {
+            color: #ff4655;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'VALORANT', sans-serif;
+        }
+        h1 {
+            color: #ff4655;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2.5em;
+        }
+        .info-container {
+            margin-bottom: 20px;
+        }
+        .price-tag {
+            display: flex;
+            align-items: center;
+            font-size: 1.3em;
+        }
+        .currency-icon {
+            height: 24px;
+            width: auto;
+            margin-right: 8px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .shop-item {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #ece8e1;
+            display: block;
+        }
+        .shop-item:hover {
+            background-color: #2a2a2a;
+        }
+        .shop-item-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .item-info h3 {
+            margin: 0;
+            font-size: 1.4em;
+            color: #ffffff;
+        }
+        .infoinfo {
+            font-weight: bold;
+            color: #ff4655;
+            margin: -5px 0 0 0;
+            font-size: 1.2em;
+        }
+        .infoinfo span {
+            color: #ece8e1;
+            display: block;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            #title {
+                font-size: 2em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <p id="title">{{ skin_name }}</p>
+    
+    <div class="info-container">
+        <p class="price-tag">
+            <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+            {{ price }}
+            <img src='{{tier_icon}}' style="width: 24px; height: 24px; margin-left: 10px;">
+        </p>
+    </div>
+
+    <p class="infoinfo">
+        <span style='color: #28f5c6'>{{ infoinfo }}</span>
+    </p>
+
+    <div class="section">
+        <h1>{{ chromainfoinfo }}</h1>
+        {% for chroma in chromas %}
+        <a href="/video/{{ chroma.video }}/{{ language }}"  class="shop-item">
+            <img src="{{ chroma.image }}" alt="{{ chroma.localized_name }}" class="shop-item-image">
+            <div class="item-info">
+                <h3>{{ chroma.localized_name }}</h3>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h1>{{ levelinfoinfo }}</h1>
+        {% for level in levels %}
+        <a href="/video/{{ level.video }}/{{ language }}"  class="shop-item">
+            <img src="{{ level.image }}" alt="{{ level.localized_name }}" class="shop-item-image">
+            <div class="item-info">
+                <h3>{{ level.localized_name }}</h3>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</body>
+</html>

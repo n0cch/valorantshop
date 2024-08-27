@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorant Shop</title>
+    <link href="https://fonts.cdnfonts.com/css/valorant" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #141414;
+            color: #ece8e1;
+        }
+        #title {
+            color: #ff4655;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        h1 {
+            color: #ff4655;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2.5em;
+        }
+        .info-container {
+            margin-bottom: 20px;
+        }
+        .wallet {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .currency-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            font-size: 1.2em;
+        }
+        .currency-icon {
+            height: 24px;
+            width: auto;
+            margin-right: 8px;
+        }
+        .infoinfo {
+            font-weight: bold;
+            color: #ff4655;
+            margin: -5px 0 0 0;
+            font-size: 1.2em;
+        }
+        .infoinfo span {
+            color: #ece8e1;
+            display: block;
+        }
+        .shop-item {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .shop-item-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            align-self: center;
+        }
+        .featured-bundle-img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            margin-bottom: 30px;
+        }
+        .price-tags {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 1.3em;
+        }
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: -10px;
+            text-align: left;
+        }
+        .item-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.4em;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            .wallet {
+                flex-wrap: wrap;
+            }
+            .currency-item {
+                margin-bottom: 10px;
+            }
+            .shop-item-image {
+                max-width: 100%;
+            }
+            .item-info h3 {
+                font-size: 1.2em;
+            }
+            .price-tags {
+                font-size: 1.1em;
+            }
+        }
+        #margin {
+            margin: 10%;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <a>
+        <p id='title' style="font-family: 'VALORANT', sans-serif;">Valorant Shop</p>
+        
+        <div class="info-container">
+            <div class="wallet">
+                <div class="currency-item">
+                    <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                    <p>{{ val_credits }}</p>
+                </div>
+                <div class="currency-item">
+                    <img class="currency-icon" src="https://media.valorant-api.com/currencies/e59aa87c-4cbf-517a-5983-6e81511be9b7/displayicon.png" alt="RP">
+                    <p>{{ rad_points }}</p>
+                </div>
+                <div class="currency-item">
+                    <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ca954a-41f2-ce94-9b45-8ca3dd39a00d/displayicon.png" alt="KC">
+                    <p>{{ kingdom_credits }}</p>
+                </div>
+            </div>
+            <p class="infoinfo">
+                <span style='color: #28f5c6'>{{ infoinfo }}</span>
+            </p>
+        </div>
+        <div id="margin"></div>
+        
+        <a href="https://valorantinfo.com/collection/{{ bundlen }}"  id="bundleinfo">
+            <h1>{{ bundletext }}</h1>
+            <div class="shop-item">
+                <img src="{{ bundleImg }}" alt="Featured Bundle" class="featured-bundle-img" style="border-radius: 15px;">
+                <div class="item-info">
+                    <h3>{{ bundle0 }}</h3>
+                    <p class="price-tags">
+                        <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                        {{ bundlePrice0 }}
+                    </p>
+                </div>
+            </div>
+        </a>
+        <div id="margin"></div>
+
+        <h1>{{ shoptext }}</h1>
+
+        <a href="{{ eitem0 }}"  id="bundleinfo">
+            <div class="shop-item">
+                <img src="{{ dailyOffer0 }}" alt="Daily Offer 1" class="shop-item-image">
+                <div class="item-info">
+                    <h3>{{ item0 }}</h3>
+                    <p class="price-tags">
+                        <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                        {{ price0 }}
+                        {% if tier_icon0 %}
+                            <img class="tier-icon" src="{{ tier_icon0 }}" alt="Tier Icon" style="width: 24px; height: 24px; margin-left: 10px;">
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ eitem1 }}"  id="bundleinfo">
+            <div class="shop-item">
+                <img src="{{ dailyOffer1 }}" alt="Daily Offer 2" class="shop-item-image">
+                <div class="item-info">
+                    <h3>{{ item1 }}</h3>
+                    <p class="price-tags">
+                        <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                        {{ price1 }}
+                        {% if tier_icon1 %}
+                            <img class="tier-icon" src="{{ tier_icon1 }}" alt="Tier Icon" style="width: 24px; height: 24px; margin-left: 10px;">
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ eitem2 }}"  id="bundleinfo">
+            <div class="shop-item">
+                <img src="{{ dailyOffer2 }}" alt="Daily Offer 3" class="shop-item-image">
+                <div class="item-info">
+                    <h3>{{ item2 }}</h3>
+                    <p class="price-tags">
+                        <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                        {{ price2 }}
+                        {% if tier_icon2 %}
+                            <img class="tier-icon" src="{{ tier_icon2 }}" alt="Tier Icon" style="width: 24px; height: 24px; margin-left: 10px;">
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ eitem3 }}"  id="bundleinfo">
+            <div class="shop-item">
+                <img src="{{ dailyOffer3 }}" alt="Daily Offer 4" class="shop-item-image">
+                <div class="item-info">
+                    <h3>{{ item3 }}</h3>
+                    <p class="price-tags">
+                        <img class="currency-icon" src="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" alt="VP">
+                        {{ price3 }}
+                        {% if tier_icon3 %}
+                            <img class="tier-icon" src="{{ tier_icon3 }}" alt="Tier Icon" style="width: 24px; height: 24px; margin-left: 10px;">
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </a>
+</body>
+</html>
