@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, render_template, jsonify
+from flask import Flask, request, render_template, jsonify
 import json
 import os
 import re
@@ -297,17 +297,19 @@ def info(uuid, language):
         tier_icon = tier_icon
     )
 
-import logging
+@app.route('/video')
+def video():
+    video_url = request.args.get('url')
+    if not video_url:
+        return "Video URL is missing", 400
 
-@app.route('/video/<path:videourl>/<language>/')
-def video(videourl, language):
-    decoded_url = unquote(videourl)
+    decoded_url = unquote(video_url)
+    
     return render_template('video.html',
-        title = translate_text('비디오 플레이어', language),
-        vib = translate_text('이 브라우저는 비디오가 지원되지 않습니다.', language),
-        videourl=decoded_url,
+        title = 'Valorant Shop',
+        vib = "X",
+        videourl=decoded_url
     )
-
 
 @app.errorhandler(404)
 def page_not_found(e):
