@@ -114,7 +114,7 @@
     <div class="section">
         <h1>{{ chromainfoinfo }}</h1>
         {% for chroma in chromas %}
-        <a href="/video/{{ chroma.video }}/{{ language }}"  class="shop-item">
+        <a href="/video?url={{ chroma.video }}/"  class="shop-item">
             <img src="{{ chroma.image }}" alt="{{ chroma.localized_name }}" class="shop-item-image">
             <div class="item-info">
                 <h3>{{ chroma.localized_name }}</h3>
@@ -126,7 +126,7 @@
     <div class="section">
         <h1>{{ levelinfoinfo }}</h1>
         {% for level in levels %}
-        <a href="/video/{{ level.video }}/{{ language }}"  class="shop-item">
+        <a href="/video?url={{ level.video }}/"  class="shop-item">
             <img src="{{ level.image }}" alt="{{ level.localized_name }}" class="shop-item-image">
             <div class="item-info">
                 <h3>{{ level.localized_name }}</h3>
