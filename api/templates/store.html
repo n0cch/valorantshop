@@ -21,7 +21,6 @@
             font-size: 2.5em;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-family: 'VALORANT', sans-serif;
         }
         h1 {
             color: #ff4655;
@@ -36,13 +35,11 @@
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            flex-wrap: wrap;
         }
         .currency-item {
             display: flex;
             align-items: center;
             margin-right: 20px;
-            margin-bottom: 10px;
             font-size: 1.2em;
         }
         .currency-icon {
@@ -53,11 +50,11 @@
         .infoinfo {
             font-weight: bold;
             color: #ff4655;
-            margin: 10px 0 0 0;
+            margin: -5px 0 0 0;
             font-size: 1.2em;
         }
         .infoinfo span {
-            color: #28f5c6;
+            color: #ece8e1;
             display: block;
         }
         .shop-item {
@@ -68,14 +65,21 @@
             display: flex;
             flex-direction: column;
         }
-        .shop-item-image, .featured-bundle-img {
-            width: auto;
-            height: 30vh;
-            min-height: 150px;
-            max-height: 200px;
+        .shop-item-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
             object-fit: contain;
             border-radius: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
+            align-self: center;
+        }
+        .featured-bundle-img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            margin-bottom: 30px;
         }
         .price-tags {
             display: flex;
@@ -87,28 +91,31 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            margin-bottom: -10px;
             text-align: left;
         }
         .item-info h3 {
             margin: 0 0 5px 0;
             font-size: 1.4em;
         }
-        #margin {
-            margin: 10% 0;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
         @media (max-width: 600px) {
             body {
                 padding: 15px;
             }
-            #title {
+            h1 {
                 font-size: 2em;
             }
-            h1 {
-                font-size: 1.8em;
+            h2 {
+                font-size: 1.5em;
+            }
+            .wallet {
+                flex-wrap: wrap;
+            }
+            .currency-item {
+                margin-bottom: 10px;
+            }
+            .shop-item-image {
+                max-width: 100%;
             }
             .item-info h3 {
                 font-size: 1.2em;
@@ -117,12 +124,19 @@
                 font-size: 1.1em;
             }
         }
+        #margin {
+            margin: 10%;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
     </style>
 </head>
 <body>
     <a>
         <p id='title' style="font-family: 'VALORANT', sans-serif;">Valorant Shop</p>
-        
+
         <div class="info-container">
             <div class="wallet">
                 <div class="currency-item">
@@ -143,7 +157,7 @@
             </p>
         </div>
         <div id="margin"></div>
-        
+
         <a href="https://valorantinfo.com/collection/{{ bundlen }}"  id="bundleinfo">
             <h1>{{ bundletext }}</h1>
             <div class="shop-item">
