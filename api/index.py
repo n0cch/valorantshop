@@ -1,20 +1,21 @@
+import concurrent.futures
+from concurrent.futures import as_completed
 import requests
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, Response, stream_with_context
 import json
 import os
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
 
 app = Flask(__name__)
 
 def translate_text(text, language):
-        if language == "ko-KR":
-            return text
-        url = 'https://playentry.org/api/expansionBlock/papago/translate/n2mt'
-        params = {'text': text, 'target': language.split('-')[0], 'source': 'ko'}
-        response = requests.get(url, params=params).json()
-        return response.get('translatedText', text)
+    if language == "ko-KR":
+        return text
+    url = 'https://playentry.org/api/expansionBlock/papago/translate/n2mt'
+    params = {'text': text, 'target': language.split('-')[0], 'source': 'ko'}
+    response = requests.get(url, params=params).json()
+    return response.get('translatedText', text)
 
 def get_skin_uuid_by_offerid(offerid, language="ko-KR"):
     base_url = "https://valorant-api.com/v1/weapons/skins"
@@ -64,10 +65,6 @@ def get_content_tier_display_icon(content_tier_uuid):
     except requests.exceptions.RequestException:
         return None
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 @app.route('/store/<username>/<password>/<region>/<language>/')
 def store(username, password, region, language):
     username = unquote(username)
@@ -86,118 +83,120 @@ def store(username, password, region, language):
         return render_template('error.html', message=translate_text('인증 실패.', language), code=500), 500
 
     auth_data = response.json()
-
-    #with open('auth_data.json', 'w', encoding='utf-8') as f:
-    #    json.dump(auth_data, f, ensure_ascii=False, indent=4)
-
+    
     # auth_data = json.load(open(os.path.join('auth_data.json'), 'r', encoding='utf-8'))
-    
-    try:
-        client_version = requests.get("https://valorant-api.com/v1/version").json()['data']['riotClientVersion']
-    except Exception as e:
-        return render_template('error.html', message=translate_text('클라이언트 버전을 가져오지 못함.', language), code=500), 500
-    headers = {
-        "X-Riot-Entitlements-JWT": auth_data['entitlements_token'],
-        "Authorization": f"Bearer {auth_data['access_token']}",
-        "X-Riot-ClientPlatform": "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
-        "X-Riot-ClientVersion": client_version,
-    }
 
-    try:
-        store_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v2/storefront/{auth_data["puuid"]}', headers=headers)
-        store_response.raise_for_status()
-        store = store_response.json()
+    def generate():
+        yield translate_text("데이터를 불러오는 중...", language).encode('utf-8')
+        
+        try:
+            yield b"<br>" + translate_text("클라이언트 버전을 확인하는 중...", language).encode('utf-8') + b"<br>"
+            client_version = requests.get("https://valorant-api.com/v1/version").json()['data']['riotClientVersion']
+        except Exception as e:
+            yield b"error"
+            return
 
-        wallet_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v1/wallet/{auth_data["puuid"]}', headers=headers)
-        wallet_response.raise_for_status()
-        wallet = wallet_response.json()
+        headers = {
+            "X-Riot-Entitlements-JWT": auth_data['entitlements_token'],
+            "Authorization": f"Bearer {auth_data['access_token']}",
+            "X-Riot-ClientPlatform": "ew0KCSJwbGF0Zm9ybVR5cGUiOiAiUEMiLA0KCSJwbGF0Zm9ybU9TIjogIldpbmRvd3MiLA0KCSJwbGF0Zm9ybU9TVmVyc2lvbiI6ICIxMC4wLjE5MDQyLjEuMjU2LjY0Yml0IiwNCgkicGxhdGZvcm1DaGlwc2V0IjogIlVua25vd24iDQp9",
+            "X-Riot-ClientVersion": client_version,
+        }
 
-        skin_offers = store['SkinsPanelLayout']['SingleItemStoreOffers']
-        display_icons = []
-        items = []
-        eitems = []
-        prices = []
+        try:
+            yield translate_text("상점 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
+            store_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v2/storefront/{auth_data["puuid"]}', headers=headers)
+            store_response.raise_for_status()
+            store = store_response.json()
 
-        for offer in skin_offers:
-            offer_id = offer['OfferID']
-            skin_data = requests.get(f"https://valorant-api.com/v1/weapons/skinlevels/{offer_id}?language={language}").json()["data"]
-            
-            display_icons.append(f"https://media.valorant-api.com/weaponskinlevels/{offer_id}/displayicon.png")
-            items.append(skin_data["displayName"])
-            eitems.append(f'/info/{skin_data["uuid"]}/{language}')
-            prices.append(str(offer["Cost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"]))
+            yield translate_text("지갑 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
+            wallet_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v1/wallet/{auth_data["puuid"]}', headers=headers)
+            wallet_response.raise_for_status()
+            wallet = wallet_response.json()
 
-        bundle_id = store['FeaturedBundle']['Bundles'][0]['DataAssetID']
+            skin_offers = store['SkinsPanelLayout']['SingleItemStoreOffers']
 
-        bundle_img = f"https://media.valorant-api.com/bundles/{bundle_id}/displayicon.png"
-        bundle_name = requests.get(f"https://valorant-api.com/v1/bundles/{bundle_id}?language={language}").json()["data"]["displayName"]
-        bundle_price = str(store["FeaturedBundle"]["Bundles"][0]["TotalDiscountedCost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"])
+            def process_skin_offer(offer):
+                offer_id = offer['OfferID']
+                skin_data = requests.get(f"https://valorant-api.com/v1/weapons/skinlevels/{offer_id}?language={language}").json()["data"]
+                
+                display_icon = f"https://media.valorant-api.com/weaponskinlevels/{offer_id}/displayicon.png"
+                item = skin_data["displayName"]
+                eitem = f'/info/{skin_data["uuid"]}/{language}'
+                price = str(offer["Cost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"])
 
-        skin_offers = store['SkinsPanelLayout']['SingleItemStoreOffers']
-        display_icons = []
-        items = []
-        eitems = []
-        prices = []
-        tier_icons = []
+                skin_uuid = get_skin_uuid_by_offerid(offer_id, language)
+                tier_icon = ""
+                if skin_uuid:
+                    content_tier_uuid = get_content_tier_uuid(skin_uuid)
+                    if content_tier_uuid:
+                        tier_icon = get_content_tier_display_icon(content_tier_uuid) or ""
 
-        for offer in skin_offers:
-            offer_id = offer['OfferID']
-            skin_data = requests.get(f"https://valorant-api.com/v1/weapons/skinlevels/{offer_id}?language={language}").json()["data"]
-            
-            display_icons.append(f"https://media.valorant-api.com/weaponskinlevels/{offer_id}/displayicon.png")
-            items.append(skin_data["displayName"])
-            eitems.append(f'/info/{skin_data["uuid"]}/{language}')
-            prices.append(str(offer["Cost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"]))
+                return {
+                    "display_icon": display_icon,
+                    "item": item,
+                    "eitem": eitem,
+                    "price": price,
+                    "tier_icon": tier_icon
+                }
 
-            skin_uuid = get_skin_uuid_by_offerid(offer_id, language)
-            if skin_uuid:
-                content_tier_uuid = get_content_tier_uuid(skin_uuid)
-                if content_tier_uuid:
-                    tier_icon = get_content_tier_display_icon(content_tier_uuid)
-                    tier_icons.append(tier_icon if tier_icon else "")
-                else:
-                    tier_icons.append("")
-            else:
-                tier_icons.append("")
+            yield translate_text("스킨 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                future_to_offer = {executor.submit(process_skin_offer, offer): i for i, offer in enumerate(skin_offers)}
+                results = [None] * len(skin_offers)
+                for future in as_completed(future_to_offer):
+                    index = future_to_offer[future]
+                    results[index] = future.result()
 
+            display_icons = [result["display_icon"] for result in results]
+            items = [result["item"] for result in results]
+            eitems = [result["eitem"] for result in results]
+            prices = [result["price"] for result in results]
+            tier_icons = [result["tier_icon"] for result in results]
 
-        return render_template('store.html',
-            val_credits=wallet["Balances"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"],
-            rad_points=wallet["Balances"]["e59aa87c-4cbf-517a-5983-6e81511be9b7"],
-            kingdom_credits=wallet["Balances"]["85ca954a-41f2-ce94-9b45-8ca3dd39a00d"],
-            bundleImg=bundle_img,
-            bundle0=bundle_name,
-            bundlen=bundle_name.lower(),
-            bundlePrice0=bundle_price,
-            dailyOffer0=display_icons[0],
-            dailyOffer1=display_icons[1],
-            dailyOffer2=display_icons[2],
-            dailyOffer3=display_icons[3],
-            item0=items[0],
-            item1=items[1],
-            item2=items[2],
-            item3=items[3],
-            eitem0=eitems[0],
-            eitem1=eitems[1],
-            eitem2=eitems[2],
-            eitem3=eitems[3],
-            price0=prices[0],
-            price1=prices[1],
-            price2=prices[2],
-            price3=prices[3],
-            tier_icon0=tier_icons[0],
-            tier_icon1=tier_icons[1],
-            tier_icon2=tier_icons[2],
-            tier_icon3=tier_icons[3],
-            infoinfo=translate_text('자세히 보려면 클릭하세요.', language),
-            bundletext=translate_text('번들', language),
-            shoptext=translate_text('스킨 상점', language),
-        ), 200
+            bundle_id = store['FeaturedBundle']['Bundles'][0]['DataAssetID']
+            bundle_img = f"https://media.valorant-api.com/bundles/{bundle_id}/displayicon.png"
+            bundle_name = requests.get(f"https://valorant-api.com/v1/bundles/{bundle_id}?language={language}").json()["data"]["displayName"]
+            bundle_price = str(store["FeaturedBundle"]["Bundles"][0]["TotalDiscountedCost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"])
 
-    except requests.exceptions.RequestException as e:
-        return render_template('error.html', message=translate_text('상점 정보를 가져오는 데 실패했습니다.', language), code=500), 500
-    
-    
+            yield render_template('store.html',
+                val_credits=wallet["Balances"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"],
+                rad_points=wallet["Balances"]["e59aa87c-4cbf-517a-5983-6e81511be9b7"],
+                kingdom_credits=wallet["Balances"]["85ca954a-41f2-ce94-9b45-8ca3dd39a00d"],
+                bundleImg=bundle_img,
+                bundle0=bundle_name,
+                bundlen=bundle_name.lower(),
+                bundlePrice0=bundle_price,
+                dailyOffer0=display_icons[0],
+                dailyOffer1=display_icons[1],
+                dailyOffer2=display_icons[2],
+                dailyOffer3=display_icons[3],
+                item0=items[0],
+                item1=items[1],
+                item2=items[2],
+                item3=items[3],
+                eitem0=eitems[0],
+                eitem1=eitems[1],
+                eitem2=eitems[2],
+                eitem3=eitems[3],
+                price0=prices[0],
+                price1=prices[1],
+                price2=prices[2],
+                price3=prices[3],
+                tier_icon0=tier_icons[0],
+                tier_icon1=tier_icons[1],
+                tier_icon2=tier_icons[2],
+                tier_icon3=tier_icons[3],
+                infoinfo=translate_text('자세히 보려면 클릭하세요.', language),
+                bundletext=translate_text('번들', language),
+                shoptext=translate_text('스킨 상점', language),
+            ).encode('utf-8')
+
+        except requests.exceptions.RequestException as e:
+            yield translate_text("오류가 발생했습니다.\n", language).encode('utf-8')
+
+    return Response(stream_with_context(generate()), content_type='text/html; charset=utf-8')
+
 @app.route('/info/<uuid>/<language>/')
 def info(uuid, language):
     base_url = "https://valorant-api.com/v1"
@@ -297,6 +296,7 @@ def info(uuid, language):
         tier_icon = tier_icon
     )
 
+
 @app.route('/video')
 def video():
     video_url = request.args.get('url')
@@ -314,3 +314,6 @@ def video():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+if __name__ == '__main__':
+    app.run(debug=True)
