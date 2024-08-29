@@ -1,7 +1,7 @@
 # Valorant Shop
 Valorant Store Viewer with Multilingual Support (And Simple UI)
 
-Translation API: https://github.com/ehd-wn/free-translate-api
+Translation API: https://github.com/MonkeySp1n/garage/tree/main/free-translate-api
 
 RiotAuth API: Configure the https://github.com/floxay/python-riot-auth module as an API.
 ```python
