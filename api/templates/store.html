@@ -132,6 +132,14 @@
             color: inherit;
         }
     </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 텍스트 노드와 <br> 태그를 모두 제거
+            while (document.body.firstChild && (document.body.firstChild.nodeType === Node.TEXT_NODE || document.body.firstChild.tagName === "BR")) {
+                document.body.removeChild(document.body.firstChild);
+            }
+        });
+    </script>
 </head>
 <body>
     <a>
