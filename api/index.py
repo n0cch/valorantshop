@@ -64,7 +64,10 @@ def get_content_tier_display_icon(content_tier_uuid):
     
     except requests.exceptions.RequestException:
         return None
-
+@app.route('/')
+def index():
+    return render_template('index.html')
+    
 @app.route('/store/<username>/<password>/<region>/<language>/')
 def store(username, password, region, language):
     username = unquote(username)
@@ -83,14 +86,11 @@ def store(username, password, region, language):
         return render_template('error.html', message=translate_text('인증 실패.', language), code=500), 500
 
     auth_data = response.json()
-    
+
     # auth_data = json.load(open(os.path.join('auth_data.json'), 'r', encoding='utf-8'))
 
     def generate():
-        yield translate_text("데이터를 불러오는 중...", language).encode('utf-8')
-        
         try:
-            yield b"<br>" + translate_text("클라이언트 버전을 확인하는 중...", language).encode('utf-8') + b"<br>"
             client_version = requests.get("https://valorant-api.com/v1/version").json()['data']['riotClientVersion']
         except Exception as e:
             yield b"error"
@@ -104,12 +104,10 @@ def store(username, password, region, language):
         }
 
         try:
-            yield translate_text("상점 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
             store_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v2/storefront/{auth_data["puuid"]}', headers=headers)
             store_response.raise_for_status()
             store = store_response.json()
 
-            yield translate_text("지갑 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
             wallet_response = requests.get(f'https://pd.{region}.a.pvp.net/store/v1/wallet/{auth_data["puuid"]}', headers=headers)
             wallet_response.raise_for_status()
             wallet = wallet_response.json()
@@ -140,7 +138,6 @@ def store(username, password, region, language):
                     "tier_icon": tier_icon
                 }
 
-            yield translate_text("스킨 정보를 가져오는 중...", language).encode('utf-8') + b"<br>"
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 future_to_offer = {executor.submit(process_skin_offer, offer): i for i, offer in enumerate(skin_offers)}
                 results = [None] * len(skin_offers)
@@ -193,7 +190,7 @@ def store(username, password, region, language):
             ).encode('utf-8')
 
         except requests.exceptions.RequestException as e:
-            yield translate_text("오류가 발생했습니다.\n", language).encode('utf-8')
+            yield translate_text("오류가 발생했습니다.", language).encode('utf-8') + b"<br>"
 
     return Response(stream_with_context(generate()), content_type='text/html; charset=utf-8')
 
