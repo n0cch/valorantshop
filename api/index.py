@@ -162,14 +162,14 @@ def store(username, password, region, language):
             bundle_img = f"https://media.valorant-api.com/bundles/{bundle_id}/displayicon.png"
             bundle_name = requests.get(f"https://valorant-api.com/v1/bundles/{bundle_id}?language={language}").json()["data"]["displayName"]
             bundle_price = str(store["FeaturedBundle"]["Bundles"][0]["TotalDiscountedCost"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"])
-
+            enbundle = requests.get(f"https://valorant-api.com/v1/bundles/{bundle_id}").json()["data"]["displayName"]
             yield render_template('store.html',
                 val_credits=wallet["Balances"]["85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741"],
                 rad_points=wallet["Balances"]["e59aa87c-4cbf-517a-5983-6e81511be9b7"],
                 kingdom_credits=wallet["Balances"]["85ca954a-41f2-ce94-9b45-8ca3dd39a00d"],
                 bundleImg=bundle_img,
                 bundle0=bundle_name,
-                bundlen=bundle_name.lower(),
+                bundlen=enbundle.lower(),
                 bundlePrice0=bundle_price,
                 dailyOffer0=display_icons[0],
                 dailyOffer1=display_icons[1],
