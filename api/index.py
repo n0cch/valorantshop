@@ -84,7 +84,7 @@ def store(username, password, region, language):
         if response.status_code != 200:
             if response.status_code == 401 and "MFA required" in response.json().get("error", ""):
                 return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=response.status_code), 401
-            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
         
         auth_data = response.json()
 
