@@ -321,4 +321,5 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
+    language = request.args.get('language', 'en')
     return render_template('error.html', message=translate_text('Error: https://github.com/MonkeySp1n', language), code=500), 500
