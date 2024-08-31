@@ -71,6 +71,22 @@
         button:hover {
             background-color: #ff5c69;
         }
+        .password-wrapper {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #ece8e1;
+            cursor: pointer;
+            font-size: 1em;
+            padding: 0;
+            width: auto;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +99,10 @@
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required>
+                    <button type="button" id="togglePassword" class="toggle-password">👁️</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="server">Server:</label>
@@ -127,6 +146,13 @@
             const language = document.getElementById('language').value;
             const url = `https://valorantshop.vercel.app/store/${username}/${password}/${server}/${language}`;
             window.location.href = url;
+        });
+
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
         });
     </script>
 </body>
