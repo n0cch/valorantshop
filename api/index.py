@@ -77,16 +77,23 @@ def store(username, password, region, language):
 
     url = "https://riotauth.vercel.app/auth/"
     headers = {"username": username, "password": password}
-    response = requests.get(url, headers=headers)
-    language = language
+    
+    try:
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            if response.status_code == 401 and "MFA required" in response.json().get("error", ""):
+                return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=response.status_code), 401
+            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+        
+        auth_data = response.json()
 
-    if response.status_code != 200:
-        if response.status_code == 401 and "MFA required" in response.json().get("error", ""):
-            return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=response.status_code), 401
-        return render_template('error.html', message=translate_text('인증 실패.', language), code=500), 500
-
-    auth_data = response.json()
-
+    except requests.exceptions.RequestException as e:
+        return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+    
+    except Exception as e:
+        return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+        
     # auth_data = json.load(open(os.path.join('auth_data.json'), 'r', encoding='utf-8'))
 
     def generate():
@@ -311,3 +318,7 @@ def video():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('error.html', message=translate_text('Error: https://github.com/MonkeySp1n', language), code=500), 500
