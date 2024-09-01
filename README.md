@@ -24,4 +24,6 @@ auth_data = response.json()
 
 Wishlist (send notifications using Discord webhooks)
 
+MFA
+
 Other UI improvements
