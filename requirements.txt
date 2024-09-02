@@ -1,5 +1,5 @@
 Flask==3.0.3
 requests==2.32.0
 beautifulsoup4==4.12.3
-aiohttp==3.10.5
+aiohttp==3.9.1
 git+https://github.com/floxay/python-riot-auth.git
