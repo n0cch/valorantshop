@@ -7,7 +7,19 @@ import os
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
 
+import asyncio
+import sys
+import riot_auth
+
 app = Flask(__name__)
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+async def async_auth(username, password):
+    auth = riot_auth.RiotAuth()
+    await auth.authorize(username, password)
+    return auth
 
 def translate_text(text, language):
     if language == "ko-KR":
@@ -75,22 +87,21 @@ def store(username, password, region, language):
     region = unquote(region)
     language = unquote(language)
 
-    url = "https://riotauth.vercel.app/auth/"
-    headers = {"username": username, "password": password}
-    
     try:
-        response = requests.get(url, headers=headers)
+        auth = asyncio.run(async_auth(username, password))
         
-        if response.status_code != 200:
-            if response.status_code == 401 and "MFA required" in response.json().get("error", ""):
-                return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=response.status_code), 401
-            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
-        
-        auth_data = response.json()
+        auth_data = {
+            "access_token": auth.access_token,
+            "entitlements_token": auth.entitlements_token,
+            "puuid": auth.user_id
+        }
 
-    except requests.exceptions.RequestException as e:
-        return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
-    
+    except riot_auth.RiotAuthError as e:
+        if "mfa" in str(e).lower():
+            return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=401), 401
+        else:
+            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+
     except Exception as e:
         return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
         
