@@ -116,10 +116,20 @@ def store(username, password, region, language):
             translated_error = translate_text(error_message, 'ko-KRR')
         else:
             translated_error = translate_text(error_message, language)
+        
+        des = translate_text('관리자에게 문의해주세요. https://github.com/MonkeySp1n', language)
+
+        plus = translate_text('혹시 403오류신가요?', language)
+        pluss = translate_text('라이엇게임즈는 우리가 하는 동작을 좋아하지 않습니다.', language)
+        lap = translate_text('그렇기 때문에 그들은 조치를 취해놓았을지도 모릅니다.', language)
 
         return render_template('error.html', 
             message=translated_error, 
-            code=error_code), error_code
+            code=error_code,
+            des=des,
+            plus=plus,
+            pluss=pluss,
+            lap=lap), error_code
         
     # auth_data = json.load(open(os.path.join('auth_data.json'), 'r', encoding='utf-8'))
 
