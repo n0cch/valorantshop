@@ -3,7 +3,7 @@ Valorant Store Viewer with Multilingual Support (And Simple UI)
 
 Translation API: https://github.com/MonkeySp1n/garage/tree/main/free-translate-api
 
-RiotAuth: Configure the https://github.com/floxay/python-riot-auth
+RiotAuth: https://github.com/floxay/python-riot-auth (IMPORTANT)
 
 # Web
 `/store/USERNAME/PASSWORD/REGION/LANGUAGE/`: Shows the user's daily stores.
