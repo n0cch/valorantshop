@@ -1,11 +1,12 @@
 import concurrent.futures
 from concurrent.futures import as_completed
 import requests
-from flask import Flask, request, render_template, Response, stream_with_context
+from flask import Flask, request, render_template, Response, stream_with_context, jsonify
 import json
 import os
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
+import re
 
 import asyncio
 import sys
@@ -25,7 +26,7 @@ def translate_text(text, language):
     if language == "ko-KR":
         return text
     url = 'https://playentry.org/api/expansionBlock/papago/translate/n2mt'
-    params = {'text': text, 'target': language.split('-')[0], 'source': 'ko'}
+    params = {'text': text, 'target': language.split('-')[0], 'source': 'auto'}
     response = requests.get(url, params=params).json()
     return response.get('translatedText', text)
 
@@ -103,7 +104,22 @@ def store(username, password, region, language):
             return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
 
     except Exception as e:
-        return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+        error_str = str(e)
+        
+        code_match = re.search(r'^(\d+)', error_str)
+        error_code = int(code_match.group(1)) if code_match else 500
+
+        message_match = re.search(r"message='([^']*)'", error_str)
+        error_message = message_match.group(1) if message_match else "Unknown error"
+
+        if language == 'ko-KR':
+            translated_error = translate_text(error_message, 'ko-KRR')
+        else:
+            translated_error = translate_text(error_message, language)
+
+        return render_template('error.html', 
+            message=translated_error, 
+            code=error_code), error_code
         
     # auth_data = json.load(open(os.path.join('auth_data.json'), 'r', encoding='utf-8'))
 
@@ -334,3 +350,6 @@ def page_not_found(e):
 def internal_server_error(e):
     language = request.args.get('language', 'en')
     return render_template('error.html', message=translate_text('Error: https://github.com/MonkeySp1n', language), code=500), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
