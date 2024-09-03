@@ -354,12 +354,18 @@ def video():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    language = request.path.split('/')[-1]
+    try:
+        pagedes = translate_text('페이지를 찾을수 없습니다.', language)
+        gohome = translate_text('홈화면으로 가기.', language)
+        print(f"Translated texts: pagedes='{pagedes}', gohome='{gohome}'")
+    except Exception as trans_error:
+        pagedes = '페이지를 찾을수 없습니다.'
+        gohome = '홈화면으로 가기.'
+    
+    return render_template('404.html', pagedes=pagedes, gohome=gohome), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
     language = request.args.get('language', 'en')
     return render_template('error.html', message=translate_text('Error: https://github.com/MonkeySp1n', language), code=500), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
