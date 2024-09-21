@@ -101,7 +101,7 @@ def store(username, password, region, language):
         if "mfa" in str(e).lower():
             return render_template('error.html', message=translate_text('2차 인증을 비활성화 해주세요.', language), code=401), 401
         else:
-            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/MonkeySp1n', language), code=500), 500
+            return render_template('error.html', message=translate_text('서버에서 오류가 발생했습니다.\n입력한 정보가 확실한지 확인하세요\n\n아니면 관리자에게 문의해주세요. https://github.com/stark7k', language), code=500), 500
 
     except Exception as e:
         error_str = str(e)
@@ -117,7 +117,7 @@ def store(username, password, region, language):
         else:
             translated_error = translate_text(error_message, language)
         
-        des = translate_text('관리자에게 문의해주세요. https://github.com/MonkeySp1n', language)
+        des = translate_text('관리자에게 문의해주세요. https://github.com/stark7k', language)
 
         plus = translate_text('혹시 403오류신가요?', language)
         pluss = translate_text('라이엇게임즈는 우리가 하는 동작을 좋아하지 않습니다.', language)
